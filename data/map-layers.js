@@ -1,0 +1,8 @@
+// III WAR WORLD — configuración de capas del mapa
+// Las geometrías se guardarán bajo data/boundaries para que el juego no dependa de APIs en tiempo de ejecución.
+window.MAP_LAYERS={
+ countries:['ALB','AND','AUT','BEL','BGR','BIH','BLR','CHE','CYP','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HRV','HUN','IRL','ISL','ITA','LIE','LTU','LUX','LVA','MDA','MKD','MLT','MNE','NLD','NOR','POL','PRT','ROU','SRB','SVK','SVN','SWE','TUR','UKR'],
+ names:{ALB:'Albania',AND:'Andorra',AUT:'Austria',BEL:'Bélgica',BGR:'Bulgaria',BIH:'Bosnia y Herzegovina',BLR:'Bielorrusia',CHE:'Suiza',CYP:'Chipre',CZE:'Chequia',DEU:'Alemania',DNK:'Dinamarca',ESP:'España',EST:'Estonia',FIN:'Finlandia',FRA:'Francia',GBR:'Reino Unido',GRC:'Grecia',HRV:'Croacia',HUN:'Hungría',IRL:'Irlanda',ISL:'Islandia',ITA:'Italia',LIE:'Liechtenstein',LTU:'Lituania',LUX:'Luxemburgo',LVA:'Letonia',MDA:'Moldavia',MKD:'Macedonia del Norte',MLT:'Malta',MNE:'Montenegro',NLD:'Países Bajos',NOR:'Noruega',POL:'Polonia',PRT:'Portugal',ROU:'Rumanía',SRB:'Serbia',SVK:'Eslovaquia',SVN:'Eslovenia',SWE:'Suecia',TUR:'Turquía',UKR:'Ucrania'},
+ // Capa 1: países. Capa 2: provincias. Capa 3: capitales. Capa 4: red. Capa 5: unidades.
+ paths:{countries:'data/boundaries/countries',provinces:'data/boundaries/provinces'}
+};
