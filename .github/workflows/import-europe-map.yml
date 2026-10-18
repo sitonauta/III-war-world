@@ -1,0 +1,47 @@
+name: Import Europe map layers
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-europe-map.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download simplified local geographic layers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/boundaries/countries data/boundaries/provinces
+          countries="ALB AND AUT BEL BGR BIH BLR CHE CYP CZE DEU DNK ESP EST FIN FRA GBR GRC HRV HUN IRL ISL ITA LIE LTU LUX LVA MDA MKD MLT MNE NLD NOR POL PRT ROU SRB SVK SVN SWE TUR UKR"
+          for iso in $countries; do
+            echo "Importing $iso"
+            for adm in ADM0 ADM2; do
+              meta="https://www.geoboundaries.org/api/current/gbOpen/${iso}/${adm}/"
+              url=$(curl -fsSL --retry 3 "$meta" | jq -r '.simplifiedGeometryGeoJSON // empty') || true
+              if [ -n "${url:-}" ]; then
+                if [ "$adm" = "ADM0" ]; then out="data/boundaries/countries/${iso}.geojson"; else out="data/boundaries/provinces/${iso}.geojson"; fi
+                curl -fL --retry 3 --retry-delay 2 "$url" -o "$out" || rm -f "$out"
+              fi
+            done
+          done
+          echo "Countries: $(find data/boundaries/countries -name '*.geojson' | wc -l)"
+          echo "Province layers: $(find data/boundaries/provinces -name '*.geojson' | wc -l)"
+      - name: Commit local layers
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/boundaries
+          if git diff --cached --quiet; then
+            echo "No geographic files changed"
+          else
+            git commit -m "Add local Europe geographic layers"
+            git push
+          fi
