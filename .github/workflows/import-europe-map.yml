@@ -50,3 +50,5 @@ jobs:
             git commit -m "Add real ADM1 regions for strategic territories"
             git push
           fi
+
+# Trigger: 2026-10-18 ADM1 retry
