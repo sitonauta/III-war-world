@@ -18,21 +18,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p data/boundaries/countries data/boundaries/provinces
+          mkdir -p data/boundaries/countries data/boundaries/regions data/boundaries/provinces
           countries="ALB AND AUT BEL BGR BIH BLR CHE CYP CZE DEU DNK ESP EST FIN FRA GBR GRC HRV HUN IRL ISL ITA LIE LTU LUX LVA MDA MKD MLT MNE NLD NOR POL PRT ROU SRB SVK SVN SWE TUR UKR"
           for iso in $countries; do
             echo "Importing $iso"
-            for adm in ADM0 ADM2; do
+            for adm in ADM0 ADM1 ADM2; do
               meta="https://www.geoboundaries.org/api/current/gbOpen/${iso}/${adm}/"
               url=$(curl -fsSL --retry 3 "$meta" | jq -r '.simplifiedGeometryGeoJSON // empty') || true
               if [ -n "${url:-}" ]; then
-                if [ "$adm" = "ADM0" ]; then out="data/boundaries/countries/${iso}.geojson"; else out="data/boundaries/provinces/${iso}.geojson"; fi
+                case "$adm" in
+                  ADM0) out="data/boundaries/countries/${iso}.geojson" ;;
+                  ADM1) out="data/boundaries/regions/${iso}.geojson" ;;
+                  ADM2) out="data/boundaries/provinces/${iso}.geojson" ;;
+                esac
                 curl -fL --retry 3 --retry-delay 2 "$url" -o "$out" || rm -f "$out"
               fi
             done
           done
           echo "Countries: $(find data/boundaries/countries -name '*.geojson' | wc -l)"
-          echo "Province layers: $(find data/boundaries/provinces -name '*.geojson' | wc -l)"
+          echo "ADM1 regions: $(find data/boundaries/regions -name '*.geojson' | wc -l)"
+          echo "ADM2 provinces: $(find data/boundaries/provinces -name '*.geojson' | wc -l)"
       - name: Commit local layers
         shell: bash
         run: |
@@ -42,6 +47,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No geographic files changed"
           else
-            git commit -m "Add local Europe geographic layers"
+            git commit -m "Add real ADM1 regions for strategic territories"
             git push
           fi
